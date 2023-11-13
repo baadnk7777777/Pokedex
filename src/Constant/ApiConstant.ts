@@ -1,0 +1,1 @@
+export const POKEMONAPI = "https://pokeapi.co/api/v2/";
