@@ -118,7 +118,9 @@ export default function Pokedex({
       <div className="flex justify-center">
         <div className="w-[1024px] flex justify-center">
           <div className=" grid grid-cols-2 md:grid-cols-5 gap-y-3 gap-4 mt-4 ">
-            {!isLoading && <PokedexDetail pokemonList={nextPokemonList} />}
+            {!isLoading && (
+              <PokedexDetail pokemonList={nextPokemonList} offset={"0"} />
+            )}
           </div>
           {nextPokemonList.length == 0 && nextPokemonList != undefined && (
             <div className=" text-black mt-4 ">
