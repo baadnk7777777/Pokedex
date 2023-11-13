@@ -25,6 +25,7 @@ export default function Pokedex({
   const [pageNext, setPageNext] = useState<string | null>();
   const [pagePrev, setPagePrev] = useState<string | null>();
   const [isLoading, setLoading] = useState(true);
+  const [isFiltered, setIsFiltered] = useState(false);
   useEffect(() => {
     setNextPokemonList(pokemonResponse.results);
     setPageNext(pokemonResponse.next);
@@ -48,6 +49,7 @@ export default function Pokedex({
         setNextPokemonList(fetchPokemonList.results);
         setPageNext(fetchPokemonList.next);
         setPagePrev(fetchPokemonList.previous);
+        setIsFiltered(false);
         setLoading(false);
         return;
       }
@@ -56,6 +58,7 @@ export default function Pokedex({
         nextPokemonList
       );
       setLoading(true);
+      setIsFiltered(true);
       setNextPokemonList([]);
       setNextPokemonList(fetchPokemonListByName);
       setLoading(false);
@@ -65,10 +68,10 @@ export default function Pokedex({
   };
 
   const handleButtonClick = async (action: string) => {
-    if (action === ActionName.NEXT) {
+    if (action === ActionName.NEXT && !isFiltered) {
       if (pageNext == null) return;
       fetchNextPokemonList(pageNext);
-    } else if (action === ActionName.PREV) {
+    } else if (action === ActionName.PREV && !isFiltered) {
       if (pagePrev == null) return;
       fetchNextPokemonList(pagePrev);
     }

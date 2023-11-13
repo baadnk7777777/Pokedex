@@ -45,7 +45,6 @@ export async function getPokemonByName(
     ];
     return pokemonSerching;
   } catch (error) {
-    // return tempPokemonList;
     throw new Error("Failed to fetch Pokemon data");
   }
 }
