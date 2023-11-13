@@ -22,12 +22,16 @@ export default function Pokedex({
   pokemonResponse: PokemonAPIResponse;
 }) {
   const [nextPokemonList, setNextPokemonList] = useState<PokemonResult[]>([]);
+  const [nextPokemonListTemp, setNextPokemonListTemp] = useState<
+    PokemonResult[]
+  >([]);
   const [pageNext, setPageNext] = useState<string | null>();
   const [pagePrev, setPagePrev] = useState<string | null>();
   const [isLoading, setLoading] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
   useEffect(() => {
     setNextPokemonList(pokemonResponse.results);
+    setNextPokemonListTemp(pokemonResponse.results);
     setPageNext(pokemonResponse.next);
     setPagePrev(pokemonResponse.previous);
     setLoading(false);
@@ -39,6 +43,7 @@ export default function Pokedex({
     setPageNext(fetchNextPokemonList.next);
     setPagePrev(fetchNextPokemonList.previous);
     setNextPokemonList(fetchNextPokemonList.results);
+    setNextPokemonListTemp(fetchNextPokemonList.results);
     setLoading(false);
   };
 
@@ -63,8 +68,28 @@ export default function Pokedex({
       setNextPokemonList(fetchPokemonListByName);
       setLoading(false);
     } catch (error) {
+      setLoading(true);
+      handleErrorSearching(name);
       setLoading(false);
     }
+  };
+
+  const handleErrorSearching = (name: string) => {
+    setNextPokemonList([]);
+    const pokemonSearching: PokemonResult[] = [];
+    nextPokemonListTemp.forEach((pokemon) => {
+      console.log("Pokemon: " + pokemon);
+      if (pokemon.name.includes(name)) {
+        const serching: PokemonResult = {
+          name: pokemon.name,
+          url: pokemon.url,
+          id: pokemon.id,
+          urlIdividal: pokemon.urlIdividal,
+        };
+        pokemonSearching.push(serching);
+      }
+      setNextPokemonList(pokemonSearching);
+    });
   };
 
   const handleButtonClick = async (action: string) => {
@@ -84,7 +109,7 @@ export default function Pokedex({
   return (
     <div className="min-h-screen bg-white">
       <PokedexHeader />
-      <div className="flex justify-center">
+      <div className="flex justify-center text-black">
         <p className=" text-2xl font-semibold mt-2">Pokemon List</p>
       </div>
       <div className="flex justify-center mt-4">
@@ -93,16 +118,13 @@ export default function Pokedex({
       <div className="flex justify-center">
         <div className="w-[1024px] flex justify-center">
           <div className=" grid grid-cols-2 md:grid-cols-5 gap-y-3 gap-4 mt-4 ">
-            {!isLoading && (
-              <PokedexDetail pokemonList={nextPokemonList} offset={"0"} />
-            )}
-            {nextPokemonList.length == 0 && nextPokemonList != undefined && (
-              <div className="w-[1024px] text-center">
-                {" "}
-                Sorry, we couldn&rsquo;t find{" "}
-              </div>
-            )}
+            {!isLoading && <PokedexDetail pokemonList={nextPokemonList} />}
           </div>
+          {nextPokemonList.length == 0 && nextPokemonList != undefined && (
+            <div className=" text-black mt-4 ">
+              Sorry, we couldn&rsquo;t find
+            </div>
+          )}
         </div>
       </div>
       <div className="flex justify-center mt-4 gap-4">
