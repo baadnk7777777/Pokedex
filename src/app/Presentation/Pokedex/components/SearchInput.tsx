@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react";
 interface SearchInputProps {
   onChange: (value: string) => void;
 }
-const SearchInput: React.FC<SearchInputProps> = (props)=> {
+const SearchInput: React.FC<SearchInputProps> = (props) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (props.onChange) {
@@ -10,8 +10,13 @@ const SearchInput: React.FC<SearchInputProps> = (props)=> {
     }
   };
   return (
-   <input onChange={handleChange} type="text" placeholder='Search Pokemon' className='pl-4 rounded-md h-10 border' />
-  )
-}
+    <input
+      onChange={handleChange}
+      type="text"
+      placeholder="Search Pokemon"
+      className="pl-4 rounded-md h-10 border text-black"
+    />
+  );
+};
 
-export default SearchInput
+export default SearchInput;

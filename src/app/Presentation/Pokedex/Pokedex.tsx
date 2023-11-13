@@ -2,77 +2,77 @@
 import React, { useEffect, useState } from "react";
 import PokedexHeader from "./components/PokedexHeader";
 import SearchInput from "./components/SearchInput";
-import PokedexCard from "./components/PokedexCard";
 import ButtonCustom from "@/app/components/ButtonCustom";
-import { PokemonResult } from "@/Domain/Model/Pokedex";
-import { GetServerSideProps } from "next";
-import { getPokemon, getPokemonByName } from "@/Data/API/PokemonAPI";
+import { PokemonAPIResponse, PokemonResult } from "@/Domain/Model/Pokedex";
+import {
+  getPokemon,
+  getPokemonByName,
+  getPokemonNextPage,
+} from "@/Data/API/PokemonAPIService";
 import PokedexDetail from "./components/PokedexDetail";
 
-interface PokedexPageProps {
-  pokemonList: any;
-}
-
 export const ActionName = {
-    NEXT: 'Next',
-    PREV: 'Prev',
-}
+  NEXT: "Next",
+  PREV: "Prev",
+};
 
-export default function Pokedex({ pokemonList }: { pokemonList: any[] }) {
-  const [nextPokemonList, setNextPokemonList] = useState<any[]>([]);
-  const [offset, setOffset] = useState(0);
-  const [searchName, setSearchName] = useState("");
-
+export default function Pokedex({
+  pokemonResponse,
+}: {
+  pokemonResponse: PokemonAPIResponse;
+}) {
+  const [nextPokemonList, setNextPokemonList] = useState<PokemonResult[]>([]);
+  const [pageNext, setPageNext] = useState<string | null>();
+  const [pagePrev, setPagePrev] = useState<string | null>();
   const [isLoading, setLoading] = useState(true);
   useEffect(() => {
-    setNextPokemonList(pokemonList);
+    setNextPokemonList(pokemonResponse.results);
+    setPageNext(pokemonResponse.next);
+    setPagePrev(pokemonResponse.previous);
     setLoading(false);
-  }, [pokemonList]);
+  }, [pokemonResponse]);
 
-  const fetchNextPokemonList = async () => {
+  const fetchNextPokemonList = async (page: string) => {
     setLoading(true);
-    const tempOffset = offset;
-    setOffset(tempOffset + 10);
-    const fetchNextPokemonList = await getPokemon(10, offset);
-    setNextPokemonList(fetchNextPokemonList);
-    setLoading(false);
-  };
-
-  const fetchPrevPokemonList = async () => {
-    const tempOffset = offset - 10;
-    if(tempOffset <= 0) return;
-    setLoading(true);
-    setOffset(tempOffset);
-    const fetchPrevPokemonList = await getPokemon(10, offset);
-    setNextPokemonList(fetchPrevPokemonList);
+    const fetchNextPokemonList = await getPokemonNextPage(page);
+    setPageNext(fetchNextPokemonList.next);
+    setPagePrev(fetchNextPokemonList.previous);
+    setNextPokemonList(fetchNextPokemonList.results);
     setLoading(false);
   };
 
   const fetchPokemonListByName = async (name: string) => {
-    setLoading(true);
-    const data = {
-        name: "pikachu",
-        url: "",
-      };
-   
-    const jsonData: string = JSON.stringify(data);
-    const convertedList: any[] = JSON.parse(jsonData) as any[];
-    console.log(nextPokemonList);
-    console.log("convertedList"+ convertedList[0]);
-    setNextPokemonList(convertedList);
-    const fetchPokemonListByName = await getPokemonByName(name);
-    console.log("fetchPokemonListByName" + fetchPokemonListByName.name);
-    setLoading(false);
-  }
+    try {
+      if (name.length == 0) {
+        const fetchPokemonList = await getPokemon(10, 0);
+        setNextPokemonList(fetchPokemonList.results);
+        setPageNext(fetchPokemonList.next);
+        setPagePrev(fetchPokemonList.previous);
+        setLoading(false);
+        return;
+      }
+      const fetchPokemonListByName = await getPokemonByName(
+        name,
+        nextPokemonList
+      );
+      setLoading(true);
+      setNextPokemonList([]);
+      setNextPokemonList(fetchPokemonListByName);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
 
   const handleButtonClick = async (action: string) => {
-    console.log(action);
-    if(action === ActionName.NEXT) {
-        fetchNextPokemonList();
-    }else if(action === ActionName.PREV) {
-        fetchPrevPokemonList();
+    if (action === ActionName.NEXT) {
+      if (pageNext == null) return;
+      fetchNextPokemonList(pageNext);
+    } else if (action === ActionName.PREV) {
+      if (pagePrev == null) return;
+      fetchNextPokemonList(pagePrev);
     }
-  }
+  };
 
   const handleSearchFilter = (value: string) => {
     fetchPokemonListByName(value);
@@ -85,30 +85,33 @@ export default function Pokedex({ pokemonList }: { pokemonList: any[] }) {
         <p className=" text-2xl font-semibold mt-2">Pokemon List</p>
       </div>
       <div className="flex justify-center mt-4">
-        <SearchInput onChange={handleSearchFilter}/>
+        <SearchInput onChange={handleSearchFilter} />
       </div>
       <div className="flex justify-center">
         <div className="w-[1024px] flex justify-center">
           <div className=" grid grid-cols-2 md:grid-cols-5 gap-y-3 gap-4 mt-4 ">
-            {!isLoading && <PokedexDetail pokemonList={nextPokemonList} offset={offset.toString()} />}
-            {nextPokemonList.length == 0 && nextPokemonList != undefined &&   <div className="w-[1024px] text-center"> Sorry, we couldn&rsquo;t find </div>}
+            {!isLoading && (
+              <PokedexDetail pokemonList={nextPokemonList} offset={"0"} />
+            )}
+            {nextPokemonList.length == 0 && nextPokemonList != undefined && (
+              <div className="w-[1024px] text-center">
+                {" "}
+                Sorry, we couldn&rsquo;t find{" "}
+              </div>
+            )}
           </div>
         </div>
       </div>
       <div className="flex justify-center mt-4 gap-4">
-        <ButtonCustom buttonName={ActionName.PREV} onClick={handleButtonClick}/>
-        <ButtonCustom buttonName={ActionName.NEXT} onClick={handleButtonClick} />
+        <ButtonCustom
+          buttonName={ActionName.PREV}
+          onClick={handleButtonClick}
+        />
+        <ButtonCustom
+          buttonName={ActionName.NEXT}
+          onClick={handleButtonClick}
+        />
       </div>
     </div>
   );
 }
-
-export const getServerSideProps = async () => {
-  const [pokemonRes] = await Promise.all([getPokemon(10,0)]);
-  const [pokemonList] = await Promise.all([pokemonRes.json()]);
-  return {
-    props: {
-      pokemonList: pokemonList.data,
-    },
-  };
-};
