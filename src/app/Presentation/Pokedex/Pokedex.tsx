@@ -78,7 +78,6 @@ export default function Pokedex({
     setNextPokemonList([]);
     const pokemonSearching: PokemonResult[] = [];
     nextPokemonListTemp.forEach((pokemon) => {
-      console.log("Pokemon: " + pokemon);
       if (pokemon.name.includes(name)) {
         const serching: PokemonResult = {
           name: pokemon.name,
