@@ -5,7 +5,7 @@ function PokedexHeader() {
     <div className="bg-red-500 flex w-full h-10 md:px-20 px-10">
       <div className=" text-white items-center flex font-bold   ">
         <p className="text-blue-400">CloudNC</p>
-        <p className="pl-2">Pokedex Challenge</p>
+        <p className="pl-2">Pokédex Challenge</p>
       </div>
     </div>
   );

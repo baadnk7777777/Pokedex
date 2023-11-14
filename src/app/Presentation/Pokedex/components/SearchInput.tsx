@@ -13,7 +13,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
     <input
       onChange={handleChange}
       type="text"
-      placeholder="Search Pokemon (Id or Name)"
+      placeholder="Search Pokemon"
       className="pl-4 rounded-md h-10 border text-black w-full"
     />
   );

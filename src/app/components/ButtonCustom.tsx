@@ -2,6 +2,7 @@ import React from "react";
 
 interface ButtonCustomProps {
     buttonName : string;
+    buttonDisable: boolean;
     onClick: (result: string) => void;
 }
 
@@ -12,7 +13,7 @@ const ButtonCustom: React.FC<ButtonCustomProps> = (props) => {
     }
   };
   return (
-    <button onClick={handleClick} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    <button onClick={handleClick} className={`${props.buttonDisable ? 'bg-gray-500' : 'bg-blue-500'}  text-white font-bold py-2 px-4 rounded`}>
       {props.buttonName}
     </button>
   );

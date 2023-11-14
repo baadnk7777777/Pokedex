@@ -25,10 +25,16 @@ export default function Pokedex({
   const [nextPokemonListTemp, setNextPokemonListTemp] = useState<
     PokemonResult[]
   >([]);
+  const [nextPokemonSearchTemp, setNextPokemonSearchTemp] = useState<
+    PokemonResult[]
+  >([]);
   const [pageNext, setPageNext] = useState<string | null>();
   const [pagePrev, setPagePrev] = useState<string | null>();
   const [isLoading, setLoading] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(0);
+  const [offset, setOffset] = useState(0);
   useEffect(() => {
     setNextPokemonList(pokemonResponse.results);
     setNextPokemonListTemp(pokemonResponse.results);
@@ -77,9 +83,8 @@ export default function Pokedex({
       console.log(fetchPokemonListByName);
       setLoading(true);
       setIsFiltered(true);
-      setNextPokemonList([]);
-      setNextPokemonList(pokemonSerchingList);
-      // validatePokemonImages();
+      createpaginated(pokemonSerchingList,currentPage);
+  
       setLoading(false);
     } catch (error) {
       setLoading(true);
@@ -106,15 +111,28 @@ export default function Pokedex({
     });
   };
 
-  const validatePokemonImages = async (imageUrl: string) => {
-    const response = await fetch(imageUrl);
-    if(response.ok == false) {
-
-    }
+  const createpaginated = (pokemonList: PokemonResult[], page: number) => {
+    var offset;
+    offset = 10 * (page - 1);
+    console.log("offset: " + offset);
+    const totalPage = Math.ceil(pokemonList.length / 10 );
+    setTotalPage(totalPage);
+    setPageNext(totalPage > page ? String(page + 1) : null);
+    setPagePrev(page - 1 ? String(page - 1) : null);
+    if(page > totalPage) return;
+    const paginatedItems = pokemonList.slice(offset, 10 * page);
+    setNextPokemonList([]);
+    setNextPokemonList(paginatedItems);
+    setNextPokemonSearchTemp(pokemonList);
   }
-
   const handleButtonClick = async (action: string) => {
-
+    if (action === ActionName.NEXT) {
+      setCurrentPage((prevPage) => prevPage + 1);
+      createpaginated(nextPokemonSearchTemp, currentPage + 1);
+    } else if (action === ActionName.PREV) {
+      setCurrentPage(currentPage-1);
+      createpaginated(nextPokemonSearchTemp, currentPage - 1);
+    }
     if (action === ActionName.NEXT && !isFiltered) {
       if (pageNext == null) return;
       fetchNextPokemonList(pageNext);
@@ -123,11 +141,9 @@ export default function Pokedex({
       fetchNextPokemonList(pagePrev);
     }
   };
-
   const handleSearchFilter = (value: string) => {
     fetchPokemonListByName(value);
   };
-
   return (
     <div className="min-h-screen bg-white">
       <PokedexHeader />
@@ -153,10 +169,12 @@ export default function Pokedex({
       </div>
       <div className="flex justify-center mt-4 gap-4">
         <ButtonCustom
+          buttonDisable={pagePrev == null ? true : false}
           buttonName={ActionName.PREV}
           onClick={handleButtonClick}
         />
         <ButtonCustom
+         buttonDisable={pageNext == null ? true : false}
           buttonName={ActionName.NEXT}
           onClick={handleButtonClick}
         />

@@ -20,7 +20,7 @@ useEffect(() => {
   setImageSrc(imageSrc)
 }, [imageSrc])
   return (
-    <div className="  block  max-w-[140px] p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <div className="  block  w-[200px] max-w-[500px] p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
         <div className="flex justify-center">
           <Image
             alt="The Pokemon Image"
