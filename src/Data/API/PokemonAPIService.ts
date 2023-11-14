@@ -1,5 +1,6 @@
 import { POKEMONAPI } from "@/Constant/ApiConstant";
 import { PokemonAPIResponse, PokemonResult } from "@/Domain/Model/Pokedex";
+import { PokemonSpeciesResponse } from "@/Domain/Model/PokemonSpecies";
 
 export async function getPokemon(
   limit: number,
@@ -30,20 +31,12 @@ export async function getPokemonNextPage(
 
 export async function getPokemonByName(
   name: string,
-  tempPokemonList: PokemonResult[]
-): Promise<PokemonResult[]> {
+): Promise<PokemonSpeciesResponse> {
   try {
-    const response = await fetch(POKEMONAPI + "pokemon/" + name);
+    console.log("Test");
+    const response = await fetch(POKEMONAPI + "pokemon-species/" + name);
     const data = await response.json();
-    const pokemonSerching: PokemonResult[] = [
-      {
-        name: data.name,
-        url: data.sprites.front_default,
-        id: data.id,
-        urlIdividal: data.sprites.front_default,
-      },
-    ];
-    return pokemonSerching;
+    return data;
   } catch (error) {
     throw new Error("Failed to fetch Pokemon data");
   }

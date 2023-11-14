@@ -60,12 +60,26 @@ export default function Pokedex({
       }
       const fetchPokemonListByName = await getPokemonByName(
         name,
-        nextPokemonList
       );
+      const pokemonSerchingList: PokemonResult[] = [];
+      fetchPokemonListByName.varieties.forEach(pokemonVarieties => {
+        console.log(pokemonVarieties.pokemon);
+        const pokemonSerching: PokemonResult = 
+      {
+        name: pokemonVarieties.pokemon.name,
+        url: pokemonVarieties.pokemon.url,
+    
+      }
+      pokemonSerchingList.push(pokemonSerching);
+    },
+    );
+      console.log("fetchPokemonListByName");
+      console.log(fetchPokemonListByName);
       setLoading(true);
       setIsFiltered(true);
       setNextPokemonList([]);
-      setNextPokemonList(fetchPokemonListByName);
+      setNextPokemonList(pokemonSerchingList);
+      // validatePokemonImages();
       setLoading(false);
     } catch (error) {
       setLoading(true);
@@ -82,16 +96,25 @@ export default function Pokedex({
         const serching: PokemonResult = {
           name: pokemon.name,
           url: pokemon.url,
-          id: pokemon.id,
           urlIdividal: pokemon.urlIdividal,
+          id: pokemon.id,
         };
+        console.log(serching);
         pokemonSearching.push(serching);
       }
       setNextPokemonList(pokemonSearching);
     });
   };
 
+  const validatePokemonImages = async (imageUrl: string) => {
+    const response = await fetch(imageUrl);
+    if(response.ok == false) {
+
+    }
+  }
+
   const handleButtonClick = async (action: string) => {
+
     if (action === ActionName.NEXT && !isFiltered) {
       if (pageNext == null) return;
       fetchNextPokemonList(pageNext);
@@ -111,8 +134,8 @@ export default function Pokedex({
       <div className="flex justify-center text-black">
         <p className=" text-2xl font-semibold mt-2">Pokemon List</p>
       </div>
-      <div className="flex justify-center mt-4">
-        <SearchInput onChange={handleSearchFilter} />
+      <div className="flex  justify-center mt-4">
+        <div className=" w-1/5"><SearchInput onChange={handleSearchFilter} /></div>
       </div>
       <div className="flex justify-center">
         <div className="w-[1024px] flex justify-center">
@@ -122,7 +145,7 @@ export default function Pokedex({
             )}
           </div>
           {nextPokemonList.length == 0 && nextPokemonList != undefined && (
-            <div className=" text-black mt-4 ">
+            <div className=" text-black mt-4">
               Sorry, we couldn&rsquo;t find
             </div>
           )}

@@ -18,9 +18,11 @@ const PokedexDetail: React.FC<PokedexPageProps> = (props) => {
             key={index}
             pokedexName={item.name}
             pokedexNunber={
+      
               item.id == null
-                ? String(Number(pokemonNumber)).padStart(3, "0")
+                ? pokemonNumber.length <= 3 ? String(Number(pokemonNumber)).padStart(3, "0") : pokemonNumber
                 : String(Number(item.id)).padStart(3, "0")
+           
             }
             pokedeximageUrl={
               item.urlIdividal == null
