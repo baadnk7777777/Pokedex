@@ -56,12 +56,15 @@ export default function Pokedex({
   const fetchPokemonListByName = async (name: string) => {
     try {
       if (name.length == 0) {
+        setLoading(true);
         const fetchPokemonList = await getPokemon(10, 0);
+        setNextPokemonList([]);
         setNextPokemonList(fetchPokemonList.results);
         setPageNext(fetchPokemonList.next);
         setPagePrev(fetchPokemonList.previous);
         setIsFiltered(false);
         setLoading(false);
+        console.log("Re Ferch");
         return;
       }
       const fetchPokemonListByName = await getPokemonByName(
