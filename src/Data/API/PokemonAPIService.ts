@@ -33,7 +33,6 @@ export async function getPokemonByName(
   name: string,
 ): Promise<PokemonSpeciesResponse> {
   try {
-    console.log("Test");
     const response = await fetch(POKEMONAPI + "pokemon-species/" + name);
     const data = await response.json();
     return data;

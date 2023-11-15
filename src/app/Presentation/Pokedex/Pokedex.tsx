@@ -64,7 +64,6 @@ export default function Pokedex({
         setPagePrev(fetchPokemonList.previous);
         setIsFiltered(false);
         setLoading(false);
-        console.log("Re Ferch");
         return;
       }
       const fetchPokemonListByName = await getPokemonByName(
