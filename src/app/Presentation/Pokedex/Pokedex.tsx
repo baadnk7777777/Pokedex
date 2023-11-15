@@ -83,7 +83,7 @@ export default function Pokedex({
       console.log(fetchPokemonListByName);
       setLoading(true);
       setIsFiltered(true);
-      createpaginated(pokemonSerchingList,currentPage);
+      createPaginated(pokemonSerchingList,currentPage);
   
       setLoading(false);
     } catch (error) {
@@ -111,34 +111,42 @@ export default function Pokedex({
     });
   };
 
-  const createpaginated = (pokemonList: PokemonResult[], page: number) => {
-    var offset;
-    offset = 10 * (page - 1);
-    console.log("offset: " + offset);
-    const totalPage = Math.ceil(pokemonList.length / 10 );
+  const createPaginated = (pokemonList: PokemonResult[], page: number) => {
+    // var offset;
+    if(page <= 0) return;
+
+    const itemsPerPage = 10;
+    const offset = itemsPerPage * (page - 1);
+    const totalPage = Math.ceil(pokemonList.length / itemsPerPage );
+
     setTotalPage(totalPage);
     setPageNext(totalPage > page ? String(page + 1) : null);
     setPagePrev(page - 1 ? String(page - 1) : null);
+
     if(page > totalPage) return;
-    const paginatedItems = pokemonList.slice(offset, 10 * page);
+
+    const paginatedItems = pokemonList.slice(offset, itemsPerPage * page);
     setNextPokemonList([]);
     setNextPokemonList(paginatedItems);
     setNextPokemonSearchTemp(pokemonList);
   }
   const handleButtonClick = async (action: string) => {
-    if (action === ActionName.NEXT) {
-      setCurrentPage((prevPage) => prevPage + 1);
-      createpaginated(nextPokemonSearchTemp, currentPage + 1);
-    } else if (action === ActionName.PREV) {
-      setCurrentPage(currentPage-1);
-      createpaginated(nextPokemonSearchTemp, currentPage - 1);
+    if((action === ActionName.NEXT || action === ActionName.PREV) && !isFiltered) {
+      console.log("Normal next");
+      const nextPage = action === ActionName.NEXT ? pageNext : pagePrev;
+      if(nextPage == null) return;
+
+      fetchNextPokemonList(nextPage);
     }
-    if (action === ActionName.NEXT && !isFiltered) {
-      if (pageNext == null) return;
-      fetchNextPokemonList(pageNext);
-    } else if (action === ActionName.PREV && !isFiltered) {
-      if (pagePrev == null) return;
-      fetchNextPokemonList(pagePrev);
+    if (action === ActionName.NEXT) {
+      console.log(totalPage);
+      if(currentPage >= totalPage) return;
+      setCurrentPage((currentPage) => currentPage + 1);
+      createPaginated(nextPokemonSearchTemp, currentPage + 1);
+    } else if (action === ActionName.PREV) {
+      if(currentPage <= 1) return;
+      setCurrentPage((currentPage) => Math.max(currentPage - 1));
+      createPaginated(nextPokemonSearchTemp, currentPage - 1);
     }
   };
   const handleSearchFilter = (value: string) => {
