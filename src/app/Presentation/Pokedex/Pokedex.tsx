@@ -69,7 +69,6 @@ export default function Pokedex({
       );
       const pokemonSerchingList: PokemonResult[] = [];
       fetchPokemonListByName.varieties.forEach(pokemonVarieties => {
-        console.log(pokemonVarieties.pokemon);
         const pokemonSerching: PokemonResult = 
       {
         name: pokemonVarieties.pokemon.name,
@@ -79,8 +78,6 @@ export default function Pokedex({
       pokemonSerchingList.push(pokemonSerching);
     },
     );
-      console.log("fetchPokemonListByName");
-      console.log(fetchPokemonListByName);
       setLoading(true);
       setIsFiltered(true);
       createPaginated(pokemonSerchingList,currentPage);
@@ -104,7 +101,6 @@ export default function Pokedex({
           urlIdividal: pokemon.urlIdividal,
           id: pokemon.id,
         };
-        console.log(serching);
         pokemonSearching.push(serching);
       }
       setNextPokemonList(pokemonSearching);
@@ -132,14 +128,12 @@ export default function Pokedex({
   }
   const handleButtonClick = async (action: string) => {
     if((action === ActionName.NEXT || action === ActionName.PREV) && !isFiltered) {
-      console.log("Normal next");
       const nextPage = action === ActionName.NEXT ? pageNext : pagePrev;
       if(nextPage == null) return;
 
       fetchNextPokemonList(nextPage);
     }
     if (action === ActionName.NEXT) {
-      console.log(totalPage);
       if(currentPage >= totalPage) return;
       setCurrentPage((currentPage) => currentPage + 1);
       createPaginated(nextPokemonSearchTemp, currentPage + 1);
